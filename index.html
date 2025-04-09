@@ -1,0 +1,443 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Ultimate Project Team Display</title>
+  <!-- html2pdf library from CDN -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.9.2/html2pdf.bundle.min.js"></script>
+  <style>
+    /* Base Reset and Fonts */
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+    body {
+      font-family: Arial, sans-serif;
+      line-height: 1.6;
+      background-color: #0a0a0a; /* Black background */
+      color: #e0e0e0; /* Light text for contrast */
+    }
+    a {
+      color: inherit;
+      text-decoration: none;
+    }
+    /* Neon Color Variables */
+    :root {
+      --bg-color: #0a0a0a; /* Deep black */
+      --text-color: #e0e0e0; /* Light gray text */
+      --card-bg: #1a1a1a; /* Slightly lighter black for cards */
+      --border-color: #333; /* Dark gray border */
+      --neon-green: #39ff14; /* Neon green */
+      --neon-pink: #ff007a; /* Neon pink */
+      --neon-blue: #00d4ff; /* Neon blue */
+      --hover-glow: rgba(57, 255, 20, 0.5); /* Neon green glow */
+    }
+    /* Page Container */
+    .container {
+      max-width: 1200px;
+      margin: 0 auto;
+      padding: 20px;
+    }
+    /* Header */
+    header {
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 20px;
+    }
+    header h1 {
+      font-size: 1.8rem;
+      color: var(--neon-green); /* Neon green title */
+    }
+    .header-buttons {
+      display: flex;
+      gap: 10px;
+      flex-wrap: wrap;
+    }
+    button {
+      cursor: pointer;
+      padding: 8px 15px;
+      border: none;
+      border-radius: 5px;
+      font-size: 0.9rem;
+      transition: background-color 0.3s, box-shadow 0.3s;
+    }
+    /* Filter Buttons */
+    .filter-bar {
+      margin-top: 15px;
+      margin-bottom: 20px;
+    }
+    .filter-btn {
+      background-color: var(--border-color);
+      color: var(--text-color);
+      margin-right: 10px;
+      margin-bottom: 10px;
+    }
+    .filter-btn.active {
+      color: #fff;
+    }
+    .filter-btn.active[data-color="pink"] {
+      background-color: var(--neon-pink);
+    }
+    .filter-btn.active[data-color="green"] {
+      background-color: var(--neon-green);
+    }
+    .filter-btn.active[data-color="blue"] {
+      background-color: var(--neon-blue);
+    }
+    /* Cards Grid */
+    .cards-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+      gap: 20px;
+    }
+    /* Team Card Style */
+    .card {
+      background-color: var(--card-bg);
+      border: 1px solid var(--border-color);
+      border-radius: 8px;
+      padding: 15px;
+      transition: transform 0.3s, box-shadow 0.3s;
+    }
+    .card:hover {
+      transform: scale(1.02);
+      box-shadow: 0 4px 20px var(--hover-glow);
+    }
+    /* Card Content */
+    .card h2 {
+      margin-bottom: 8px;
+      font-size: 1.2rem;
+      color: var(--neon-pink); /* Neon pink team names */
+      border-bottom: 1px solid var(--neon-blue); /* Neon blue underline */
+      padding-bottom: 5px;
+    }
+    .card p.topic {
+      font-style: italic;
+      margin-bottom: 10px;
+      color: var(--neon-green); /* Neon green topic */
+    }
+    .card ul {
+      list-style: none;
+    }
+    .card ul li {
+      margin-bottom: 5px;
+      font-size: 0.9rem;
+      color: var(--text-color);
+    }
+    /* Footer */
+    footer {
+      text-align: center;
+      margin-top: 30px;
+      padding-top: 15px;
+      border-top: 1px solid var(--neon-blue);
+      font-size: 0.9rem;
+      color: var(--neon-pink);
+    }
+    /* Floating Back to Top Button */
+    #backToTop {
+      position: fixed;
+      bottom: 25px;
+      right: 25px;
+      background-color: var(--neon-blue);
+      color: #fff;
+      border: none;
+      border-radius: 50%;
+      width: 50px;
+      height: 50px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      opacity: 0;
+      visibility: hidden;
+      transition: opacity 0.3s;
+      z-index: 1000;
+    }
+    #backToTop.show {
+      opacity: 1;
+      visibility: visible;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <!-- Header with title, team counter and buttons -->
+    <header>
+      <h1>Ultimate Project Team Display</h1>
+      <div class="header-buttons">
+        <!-- Total Teams Counter: will be updated by JS -->
+        <button id="teamCounter">Total Teams: 0</button>
+        <!-- Export to PDF Button -->
+        <button id="exportPdf" style="background-color: var(--neon-blue); color: #fff;">Download PDF</button>
+      </div>
+    </header>
+
+    <!-- Filter Bar -->
+    <div class="filter-bar" id="filterBar">
+      <!-- Filter buttons will be generated dynamically -->
+    </div>
+
+    <!-- Cards Grid -->
+    <div class="cards-grid" id="cardsGrid">
+      <!-- Team Cards will be generated dynamically -->
+    </div>
+  </div>
+
+  <!-- Floating Back to Top Button -->
+  <button id="backToTop" title="Back to Top">⇧</button>
+
+  <!-- Footer -->
+  <footer>
+    Crafted with passion by NANDA KISHORE SREEJITH SBNG | CSE
+  </footer>
+
+  <!-- JavaScript -->
+  <script>
+    // Data for team cards
+    const teams = [
+      {
+        teamName: "CodeBankers",
+        topic: "Banking Portal with Customer & Admin Roles",
+        members: [
+          { name: "NANDA KISHORE SREEJITH", roll: "118" },
+          { name: "NANTHA KISHORE", roll: "119" },
+          { name: "MIRTHUN", roll: "105" },
+          { name: "KAVYA B", roll: "81" }
+        ]
+      },
+      {
+        teamName: "Cinemates",
+        topic: "Movie Theater Booking System",
+        members: [
+          { name: "S.Madhushree", roll: "101" },
+          { name: "Ishwarya.E.S", roll: "67" },
+          { name: "Mayooritha.P", roll: "104" },
+          { name: "Kavya J", roll: "84" }
+        ]
+      },
+      {
+        teamName: "The Medics",
+        topic: "Hospital Patient Management System",
+        members: [
+          { name: "Kayal Nethra", roll: "85" },
+          { name: "Keerthana R", roll: "87" },
+          { name: "Kesava Navya", roll: "90" },
+          { name: "Navya S", roll: "122" }
+        ]
+      },
+      {
+        teamName: "SecureCartX",
+        topic: "E-Commerce System with Role-Based Access",
+        members: [
+          { name: "NAVEEN", roll: "121" },
+          { name: "NARENDRAN", roll: "120" },
+          { name: "LABAN LEVI", roll: "96" },
+          { name: "MANIKANDAPRABHU", roll: "103" }
+        ]
+      },
+      {
+        teamName: "Devsquad",
+        topic: "Online Marketplace Platform",
+        members: [
+          { name: "Kabilesh P K", roll: "77" },
+          { name: "Keertan Kumar S", roll: "86" },
+          { name: "Jaya Surya R", roll: "72" },
+          { name: "Harish Sankar", roll: "65" }
+        ]
+      },
+      {
+        teamName: "Electro vote",
+        topic: "Digital Voting System",
+        members: [
+          { name: "hemashree", roll: "92" },
+          { name: "Monisha", roll: "112" },
+          { name: "santhosh", roll: "93" },
+          { name: "kuilmozhi", roll: "95" }
+        ]
+      },
+      {
+        teamName: "Team 7",
+        topic: "Multi-Tier Employee Management System",
+        members: [
+          { name: "Madhav Krishna", roll: "98" },
+          { name: "Mohammad Adib", roll: "107" },
+          { name: "Anerudh", roll: "117" },
+          { name: "Murali", roll: "116" }
+        ]
+      },
+      {
+        teamName: "Team 8",
+        topic: "University Information System",
+        members: [
+          { name: "Jennifer Antonett J", roll: "73" },
+          { name: "Keerthana Sree", roll: "88" },
+          { name: "Priyanka", roll: "76" },
+          { name: "Kaviya", roll: "83" }
+        ]
+      },
+      {
+        teamName: "Deadline Simulators",
+        topic: "Smart Home Automation Simulator",
+        members: [
+          { name: "Madhu Sree Raja", roll: "100" },
+          { name: "M Mahima Sree", roll: "97" },
+          { name: "Hemanya Y", roll: "66" }
+        ]
+      },
+      {
+        teamName: "Calvin Klein",
+        topic: "University Information System",
+        members: [
+          { name: "Nithesh Kumar", roll: "123" },
+          { name: "Mani Balan", roll: "102" },
+          { name: "Krishanth", roll: "94" },
+          { name: "Harris", roll: "115" }
+        ]
+      },
+      {
+        teamName: "Pack to the Future",
+        topic: "Courier and Logistics Tracking System",
+        members: [
+          { name: "Harini priya K", roll: "64" },
+          { name: "Iswarya P", roll: "68" },
+          { name: "J.U.Umabarathi", roll: "69" },
+          { name: "K L Harini", roll: "75" }
+        ]
+      },
+      {
+        teamName: "NOTHING",
+        topic: "Vehicle and Rental System",
+        members: [
+          { name: "Keerthi Vasan", roll: "89" },
+          { name: "Mohith", roll: "109" },
+          { name: "Jagatheshkumar", roll: "70" },
+          { name: "Mithun", roll: "106" }
+        ]
+      },
+      {
+        teamName: "Tech Titans",
+        topic: "Travel Agency Booking System",
+        members: [
+          { name: "Janani Prakash", roll: "71" },
+          { name: "Monisha T", roll: "113" },
+          { name: "Kanisha S", roll: "79" },
+          { name: "Kaviya M", roll: "82" }
+        ]
+      },
+      {
+        teamName: "SoloSpark",
+        topic: "Smart Library Management System",
+        members: [
+          { name: "K Kishore Rathinam", roll: "74" }
+        ]
+      }
+    ];
+
+    // Generate Team Cards
+    const cardsGrid = document.getElementById('cardsGrid');
+    teams.forEach((team) => {
+      const card = document.createElement('div');
+      card.classList.add('card');
+
+      // Team Name and Topic
+      const teamName = document.createElement('h2');
+      teamName.textContent = team.teamName;
+      card.appendChild(teamName);
+
+      const topic = document.createElement('p');
+      topic.classList.add('topic');
+      topic.textContent = team.topic;
+      card.appendChild(topic);
+
+      // Member List
+      const ul = document.createElement('ul');
+      team.members.forEach(member => {
+        const li = document.createElement('li');
+        li.textContent = `${member.name} (${member.roll})`;
+        ul.appendChild(li);
+      });
+      card.appendChild(ul);
+
+      // Add a data attribute for filtering
+      card.dataset.topic = team.topic.toLowerCase();
+      cardsGrid.appendChild(card);
+    });
+
+    // Update Total Teams Counter
+    const teamCounter = document.getElementById('teamCounter');
+    teamCounter.textContent = `Total Teams: ${teams.length}`;
+
+    // Generate Filter Buttons based on unique topics
+    const filterBar = document.getElementById('filterBar');
+    let topicsSet = new Set();
+    teams.forEach(team => topicsSet.add(team.topic));
+    const topics = Array.from(topicsSet).sort();
+
+    // Add an "All" button
+    const allBtn = document.createElement('button');
+    allBtn.classList.add('filter-btn');
+    allBtn.textContent = "All";
+    allBtn.dataset.filter = "all";
+    filterBar.appendChild(allBtn);
+
+    topics.forEach(topic => {
+      const btn = document.createElement('button');
+      btn.classList.add('filter-btn');
+      btn.textContent = topic;
+      btn.dataset.filter = topic.toLowerCase();
+      // Assign a neon color cyclically
+      const colorIndex = topics.indexOf(topic) % 3;
+      btn.dataset.color = (colorIndex === 0) ? 'pink' : (colorIndex === 1 ? 'green' : 'blue');
+      filterBar.appendChild(btn);
+    });
+
+    // Filter functionality
+    const filterBtns = document.querySelectorAll('.filter-btn');
+    filterBtns.forEach(btn => {
+      btn.addEventListener('click', () => {
+        filterBtns.forEach(b => b.classList.remove('active'));
+        btn.classList.add('active');
+
+        const filter = btn.dataset.filter;
+        const cards = document.querySelectorAll('.card');
+        cards.forEach(card => {
+          if (filter === 'all' || card.dataset.topic === filter) {
+            card.style.display = 'block';
+          } else {
+            card.style.display = 'none';
+          }
+        });
+      });
+    });
+
+    // Export to PDF functionality
+    document.getElementById('exportPdf').addEventListener('click', () => {
+      const element = document.querySelector('.container');
+      const opt = {
+        margin: 0.5,
+        filename: 'project-teams.pdf',
+        image: { type: 'jpeg', quality: 0.98 },
+        html2canvas: { scale: 2 },
+        jsPDF: { unit: 'in', format: 'letter', orientation: 'portrait' }
+      };
+      html2pdf().set(opt).from(element).save();
+    });
+
+    // Floating Back to Top Button functionality
+    const backToTopBtn = document.getElementById('backToTop');
+    window.addEventListener('scroll', () => {
+      if (window.pageYOffset > 300) {
+        backToTopBtn.classList.add('show');
+      } else {
+        backToTopBtn.classList.remove('show');
+      }
+    });
+    backToTopBtn.addEventListener('click', () => {
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    });
+  </script>
+</body>
+</html>
