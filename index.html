@@ -29,9 +29,10 @@
       --text-color: #e0e0e0; /* Light gray text */
       --card-bg: #1a1a1a; /* Slightly lighter black for cards */
       --border-color: #333; /* Dark gray border */
-      --neon-green: #39ff14; /* Neon green */
+      --neon-green: #39ff14; /* Neon green (kept for other elements) */
       --neon-pink: #ff007a; /* Neon pink */
       --neon-blue: #00d4ff; /* Neon blue */
+      --neon-red: #ff1a1a; /* Neon red */
       --hover-glow: rgba(57, 255, 20, 0.5); /* Neon green glow */
     }
     /* Page Container */
@@ -82,11 +83,11 @@
     .filter-btn.active[data-color="pink"] {
       background-color: var(--neon-pink);
     }
-    .filter-btn.active[data-color="green"] {
-      background-color: var(--neon-green);
-    }
     .filter-btn.active[data-color="blue"] {
       background-color: var(--neon-blue);
+    }
+    .filter-btn.active[data-color="red"] {
+      background-color: var(--neon-red);
     }
     /* Cards Grid */
     .cards-grid {
@@ -345,7 +346,6 @@
           { name: "Karthikrishna.V", roll: "80" }
         ]
       }
-
     ];
 
     // Generate Team Cards
@@ -400,9 +400,9 @@
       btn.classList.add('filter-btn');
       btn.textContent = topic;
       btn.dataset.filter = topic.toLowerCase();
-      // Assign a neon color cyclically
+      // Assign a neon color cyclically (pink, blue, red)
       const colorIndex = topics.indexOf(topic) % 3;
-      btn.dataset.color = (colorIndex === 0) ? 'pink' : (colorIndex === 1 ? 'green' : 'blue');
+      btn.dataset.color = (colorIndex === 0) ? 'pink' : (colorIndex === 1 ? 'blue' : 'red');
       filterBar.appendChild(btn);
     });
 
